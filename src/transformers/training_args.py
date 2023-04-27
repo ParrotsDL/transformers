@@ -1084,9 +1084,21 @@ class TrainingArguments:
                 torch.distributed.init_process_group(backend="nccl")
             device = torch.device("cuda", self.local_rank)
             self._n_gpu = 1
+        #     pass
+        # os.environ['MASTER_ADDR'] = "127.0.0.1"
+        # os.environ['MASTER_PORT'] = "15205"
+        # os.environ['WORLD_SIZE'] = str(torch.cuda.device_count())
+        # os.environ['RANK'] = str(self.local_rank)
+        # if not torch.distributed.is_initialized():
+        #     torch.distributed.init_process_group(backend="nccl")
+        # torch.cuda.set_device(self.local_rank)
+        # device = torch.device("cuda", self.local_rank)
+        # self._n_gpu = torch.cuda.device_count()
 
         if device.type == "cuda":
-            torch.cuda.set_device(device)
+            # torch.cuda.set_device(device)
+            print("device is:", device)
+            print("type device is:", type(device))
 
         return device
 

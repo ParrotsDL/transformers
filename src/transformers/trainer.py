@@ -1763,9 +1763,11 @@ class Trainer:
         if torch.cuda.is_available():
             if self.args.local_rank == -1:
                 # In non distributed, we save the global CUDA RNG state (will take care of DataParallel)
-                rng_states["cuda"] = torch.cuda.random.get_rng_state_all()
+                # rng_states["cuda"] = torch.cuda.random.get_rng_state_all()
+                rng_states["cuda"] = torch.cuda.get_rng_state_all()
             else:
-                rng_states["cuda"] = torch.cuda.random.get_rng_state()
+                # rng_states["cuda"] = torch.cuda.random.get_rng_state()
+                rng_states["cuda"] = torch.cuda.get_rng_state()
 
         if is_torch_tpu_available():
             rng_states["xla"] = xm.get_rng_state()

@@ -46,7 +46,8 @@ if USE_TORCH in ENV_VARS_TRUE_AND_AUTO_VALUES and USE_TF not in ENV_VARS_TRUE_VA
     _torch_available = importlib.util.find_spec("torch") is not None
     if _torch_available:
         try:
-            _torch_version = importlib_metadata.version("torch")
+            # _torch_version = importlib_metadata.version("torch")
+            _torch_version = 'parrots'
             logger.info(f"PyTorch version {_torch_version} available.")
         except importlib_metadata.PackageNotFoundError:
             _torch_available = False
@@ -324,7 +325,8 @@ def is_torch_tf32_available():
 torch_version = None
 _torch_fx_available = _torch_onnx_dict_inputs_support_available = False
 if _torch_available:
-    torch_version = version.parse(importlib_metadata.version("torch"))
+    # torch_version = version.parse(importlib_metadata.version("torch"))
+    torch_version = version.parse("1.3.0")
     _torch_fx_available = (torch_version.major, torch_version.minor) == (
         TORCH_FX_REQUIRED_VERSION.major,
         TORCH_FX_REQUIRED_VERSION.minor,

@@ -89,9 +89,9 @@ def nested_concat(tensors, new_tensors, padding_index=-100):
     Concat the `new_tensors` to `tensors` on the first dim and pad them on the second if needed. Works for tensors or
     nested list/tuples of tensors.
     """
-    assert type(tensors) == type(
-        new_tensors
-    ), f"Expected `tensors` and `new_tensors` to have the same type but found {type(tensors)} and {type(new_tensors)}."
+    # assert type(tensors) == type(
+    #     new_tensors
+    # ), f"Expected `tensors` and `new_tensors` to have the same type but found {type(tensors)} and {type(new_tensors)}."
     if isinstance(tensors, (list, tuple)):
         return type(tensors)(nested_concat(t, n, padding_index=padding_index) for t, n in zip(tensors, new_tensors))
     elif isinstance(tensors, torch.Tensor):
@@ -127,11 +127,11 @@ def nested_numpify(tensors):
     if isinstance(tensors, (list, tuple)):
         return type(tensors)(nested_numpify(t) for t in tensors)
     t = tensors.cpu()
-    if t.dtype == torch.bfloat16:
-        # As of Numpy 1.21.4, NumPy does not support bfloat16 (see
-        # https://github.com/numpy/numpy/blob/a47ecdea856986cd60eabbd53265c2ca5916ad5d/doc/source/user/basics.types.rst ).
-        # Until Numpy adds bfloat16, we must convert float32.
-        t = t.to(torch.float32)
+    # if t.dtype == torch.bfloat16:
+    #     # As of Numpy 1.21.4, NumPy does not support bfloat16 (see
+    #     # https://github.com/numpy/numpy/blob/a47ecdea856986cd60eabbd53265c2ca5916ad5d/doc/source/user/basics.types.rst ).
+    #     # Until Numpy adds bfloat16, we must convert float32.
+    #     t = t.to(torch.float32)
     return t.numpy()
 
 
