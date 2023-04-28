@@ -650,7 +650,7 @@ class Trainer:
                     self.train_dataset,
                     num_replicas=self.args.world_size,
                     rank=self.args.process_index,
-                    seed=seed,
+                    # seed=seed,
                 )
 
     def get_train_dataloader(self) -> DataLoader:

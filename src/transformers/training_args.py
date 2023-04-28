@@ -21,6 +21,7 @@ from dataclasses import asdict, dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+import subprocess
 
 from .debug_utils import DebugOption
 from .trainer_utils import EvaluationStrategy, HubStrategy, IntervalStrategy, SchedulerType, ShardedDDPOption
@@ -764,6 +765,19 @@ class TrainingArguments:
         if env_local_rank != -1 and env_local_rank != self.local_rank:
             self.local_rank = env_local_rank
 
+        # import pdb
+        # pdb.set_trace()
+        node_list = os.environ['SLURM_NODELIST']
+        addr = subprocess.getoutput(f'scontrol show hostname {node_list} | head -n1')
+        os.environ['MASTER_ADDR'] = addr
+        os.environ['MASTER_PORT'] = "15204"
+        self.local_rank = int(os.environ['SLURM_LOCALID'])
+        self.world_sizes = int(os.environ['SLURM_NTASKS'])
+        rank = os.environ['SLURM_PROCID']
+        os.environ['RANK'] = rank
+        os.environ['WORLD_SIZE'] = str(self.world_sizes)
+        print("IIIIIIIIIIIIIIIInfo: ", self.world_sizes, rank, self.local_rank)
+
         # convert to int
         self.log_level = trainer_log_levels[self.log_level]
         self.log_level_replica = trainer_log_levels[self.log_level_replica]
@@ -1083,7 +1097,7 @@ class TrainingArguments:
             if not torch.distributed.is_initialized():
                 torch.distributed.init_process_group(backend="nccl")
             device = torch.device("cuda", self.local_rank)
-            self._n_gpu = 1
+            self._n_gpu = self.world_sizes
         #     pass
         # os.environ['MASTER_ADDR'] = "127.0.0.1"
         # os.environ['MASTER_PORT'] = "15205"
@@ -1099,6 +1113,8 @@ class TrainingArguments:
             # torch.cuda.set_device(device)
             print("device is:", device)
             print("type device is:", type(device))
+        print("XXXXXXXX: ", self.local_rank)
+        torch.cuda.set_device(self.local_rank)
 
         return device
 
@@ -1162,7 +1178,8 @@ class TrainingArguments:
         elif is_sagemaker_dp_enabled():
             return dist.get_world_size()
         elif self.local_rank != -1:
-            return torch.distributed.get_world_size()
+            return self.world_sizes
+            # return torch.distributed.get_world_size()
         return 1
 
     @property
